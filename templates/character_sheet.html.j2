@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ character.name }} — City of Mist Character Sheet</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm;
+  }
+
+  :root {
+    --ink: #14110f;
+    --paper: #faf6ef;
+    --accent: #7a2222;
+    --muted: #6a655c;
+    --rule: #2a2622;
+    --tag-bg: #f1ead9;
+    --weak-bg: #f9e6e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, "Inter", "Avenir Next", Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.35;
+  }
+
+  body { padding: 8mm 6mm; }
+
+  /* ===== Header ===== */
+  header.character-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 6mm;
+    border-bottom: 2px solid var(--rule);
+    padding-bottom: 4mm;
+    margin-bottom: 6mm;
+  }
+  .character-name {
+    font-family: "Helvetica Neue", Helvetica, "Inter", "Avenir Next", Arial, sans-serif;
+    font-size: 28pt;
+    font-weight: bold;
+    line-height: 1;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .character-pronouns {
+    font-size: 9pt;
+    color: var(--muted);
+    font-style: italic;
+    margin-left: 0.3em;
+  }
+  .character-meta {
+    font-size: 9pt;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.5;
+  }
+  .character-meta .label {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 7.5pt;
+    color: var(--accent);
+    font-weight: bold;
+    margin-right: 0.4em;
+  }
+  .concept-row {
+    margin-top: 1mm;
+    font-size: 10pt;
+  }
+  .concept-row .pair {
+    display: inline-block;
+    margin-right: 6mm;
+  }
+  .concept-row .label {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 7.5pt;
+    color: var(--accent);
+    font-weight: bold;
+    margin-right: 0.4em;
+  }
+
+  /* ===== Theme grid ===== */
+  .themes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5mm;
+    margin-bottom: 6mm;
+  }
+
+  .theme {
+    border: 1.5px solid var(--rule);
+    border-radius: 2px;
+    padding: 4mm 4mm 3mm 4mm;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    background: var(--paper);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .theme-type {
+    position: absolute;
+    top: -1px;
+    right: 8px;
+    background: var(--rule);
+    color: var(--paper);
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 1px 6px 2px;
+    font-weight: bold;
+  }
+  .theme-type.mythos { background: #1d3a55; }
+  .theme-type.logos  { background: #4a2622; }
+  .theme-type.crew   { background: #355c3a; }
+  .theme-type.extra  { background: #6a4f1d; }
+
+  .theme-title {
+    font-size: 16pt;
+    font-weight: bold;
+    margin: 0 0 1mm 0;
+    line-height: 1.1;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1mm;
+  }
+  .theme-themebook {
+    font-size: 8pt;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 2mm;
+  }
+
+  .theme-mystery {
+    background: var(--tag-bg);
+    border-left: 3px solid var(--accent);
+    padding: 2mm 3mm;
+    margin: 2mm 0 3mm;
+    font-style: italic;
+    font-size: 10pt;
+  }
+  .theme-mystery .kind {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 7pt;
+    font-style: normal;
+    color: var(--accent);
+    font-weight: bold;
+    display: block;
+    margin-bottom: 1mm;
+  }
+
+  .tag-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2mm 0;
+  }
+  .tag-list li {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    gap: 4px;
+    align-items: baseline;
+    padding: 1px 0;
+    font-size: 10pt;
+  }
+  .tag-letter {
+    font-weight: bold;
+    font-family: "Helvetica Neue", Helvetica, "Inter", "Avenir Next", Arial, sans-serif;
+    color: var(--accent);
+  }
+  .tag-text {
+    font-family: "Helvetica Neue", Helvetica, "Inter", "Avenir Next", Arial, sans-serif;
+  }
+  .tag-flag {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: bold;
+  }
+  .tag-flag.burnt { color: #8b1a1a; text-decoration: line-through; }
+
+  .section-label {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    font-weight: bold;
+    margin: 2mm 0 1mm 0;
+    border-bottom: 1px dotted var(--muted);
+    padding-bottom: 0.5mm;
+  }
+
+  .theme-tracks {
+    display: flex;
+    gap: 6mm;
+    margin-top: auto;
+    padding-top: 2mm;
+    font-size: 8pt;
+    color: var(--muted);
+  }
+  .track {
+    display: flex;
+    align-items: center;
+    gap: 1mm;
+  }
+  .track .label {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 7pt;
+    font-weight: bold;
+    color: var(--accent);
+  }
+  .track .boxes { display: inline-flex; gap: 2px; }
+  .track .box {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--ink);
+    display: inline-block;
+  }
+  .track .box.filled { background: var(--ink); }
+
+  .theme-improvements {
+    margin-top: 2mm;
+    font-size: 8.5pt;
+    color: var(--muted);
+  }
+  .theme-improvements .item {
+    display: inline-block;
+    background: var(--tag-bg);
+    padding: 0 4px;
+    margin: 1px 2px 1px 0;
+    border: 1px solid var(--muted);
+    font-size: 8pt;
+  }
+
+  /* ===== Footer / notes ===== */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5mm;
+    margin-top: 4mm;
+    padding-top: 4mm;
+    border-top: 2px solid var(--rule);
+    page-break-inside: avoid;
+  }
+  .footer-section h3 {
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    margin: 0 0 2mm 0;
+    border-bottom: 1px solid var(--muted);
+    padding-bottom: 1mm;
+  }
+  .footer-section ul {
+    margin: 0;
+    padding-left: 4mm;
+    font-size: 9pt;
+  }
+  .footer-section li {
+    margin-bottom: 1.5mm;
+    line-height: 1.4;
+  }
+  .footer-section p {
+    margin: 0;
+    font-size: 9pt;
+    line-height: 1.4;
+  }
+
+  .play-state {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4mm;
+    margin-top: 3mm;
+  }
+  .play-state .stat {
+    border: 1px solid var(--muted);
+    padding: 2mm 3mm;
+    text-align: center;
+  }
+  .play-state .stat .label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    font-weight: bold;
+    display: block;
+  }
+  .play-state .stat .value {
+    font-size: 16pt;
+    font-weight: bold;
+    line-height: 1.1;
+  }
+
+  /* ===== Print tweaks ===== */
+  @media print {
+    body { padding: 0; }
+    .theme { break-inside: avoid; }
+    .footer-grid { break-inside: avoid; }
+  }
+
+  @media screen {
+    body {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 12mm 14mm;
+      box-shadow: 0 0 24px rgba(0,0,0,0.15);
+      min-height: 297mm;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="character-header">
+  <div>
+    <h1 class="character-name">
+      {{ character.name }}{% if character.pronouns %}<span class="character-pronouns">({{ character.pronouns }})</span>{% endif %}
+    </h1>
+    <div class="concept-row">
+      <span class="pair"><span class="label">Mythos</span>{{ character.concept.mythos }}</span>
+      <span class="pair"><span class="label">Logos</span>{{ character.concept.logos }}</span>
+    </div>
+    {% if character.concept.mythos_description or character.concept.logos_description %}
+    <div class="concept-row" style="font-style: italic; font-size: 9pt; color: var(--muted); margin-top: 1mm;">
+      {% if character.concept.mythos_description %}{{ character.concept.mythos_description }}{% endif %}
+      {% if character.concept.logos_description %}{% if character.concept.mythos_description %} · {% endif %}{{ character.concept.logos_description }}{% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="character-meta">
+    {% if character.character_class %}<div><span class="label">Class</span>{{ character.character_class | capitalize }}</div>{% endif %}
+    <div><span class="label">Awareness</span>{{ character.awareness }} / 10</div>
+    {% if character.setting %}<div><span class="label">Setting</span>{{ character.setting }}</div>{% endif %}
+  </div>
+</header>
+
+<section class="themes">
+  {% for theme in character.themes %}
+  <article class="theme">
+    <span class="theme-type {{ theme.type }}">{{ theme.type }}</span>
+    <h2 class="theme-title">{{ theme.title }}</h2>
+    <div class="theme-themebook">{{ theme.themebook }}</div>
+
+    <div class="theme-mystery">
+      <span class="kind">{{ theme.mystery_or_identity.kind }}</span>
+      “{{ theme.mystery_or_identity.text }}”
+    </div>
+
+    <div class="section-label">Power Tags</div>
+    <ul class="tag-list">
+      {% for t in theme.power_tags %}
+      <li>
+        <span class="tag-letter">{{ t.letter }}</span>
+        <span class="tag-text">{{ t.tag }}</span>
+        <span class="tag-flag">
+          {%- if t.extra %}extra{% endif -%}
+          {%- if t.burnt %}{% if t.extra %} · {% endif %}burnt{% endif -%}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="section-label">Weakness Tags</div>
+    <ul class="tag-list">
+      {% for t in theme.weakness_tags %}
+      <li>
+        <span class="tag-letter">{{ t.letter }}</span>
+        <span class="tag-text">{{ t.tag }}</span>
+        <span class="tag-flag">{% if t.extra %}extra{% endif %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% if theme.improvements_taken %}
+    <div class="section-label">Improvements</div>
+    <div class="theme-improvements">
+      {% for imp in theme.improvements_taken %}<span class="item">{{ imp }}</span>{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="theme-tracks">
+      <div class="track">
+        <span class="label">Att</span>
+        <span class="boxes">
+          {% for i in range(3) %}<span class="box {% if i < theme.attention|default(0) %}filled{% endif %}"></span>{% endfor %}
+        </span>
+      </div>
+      <div class="track">
+        <span class="label">{% if theme.type == 'mythos' %}Fade{% else %}Crack{% endif %}</span>
+        <span class="boxes">
+          {% for i in range(3) %}<span class="box {% if i < theme.fade_or_crack|default(0) %}filled{% endif %}"></span>{% endfor %}
+        </span>
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+
+<section class="footer-grid">
+  {% if character.connections %}
+  <div class="footer-section">
+    <h3>Connections & Callbacks</h3>
+    <ul>
+      {% for c in character.connections %}<li>{{ c }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if character.nemeses or character.secondary_characters or character.notes %}
+  <div class="footer-section">
+    {% if character.nemeses %}
+    <h3>Nemeses</h3>
+    <ul>{% for n in character.nemeses %}<li><strong>{{ n.name }}</strong>{% if n.from_theme %} <em>(from: {{ n.from_theme }})</em>{% endif %}{% if n.description %} — {{ n.description }}{% endif %}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if character.secondary_characters %}
+    <h3>Secondary Characters</h3>
+    <ul>{% for s in character.secondary_characters %}<li><strong>{{ s.name }}</strong>{% if s.role %} <em>({{ s.role }})</em>{% endif %}{% if s.description %} — {{ s.description }}{% endif %}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if character.notes %}
+    <h3>Notes</h3>
+    <p>{{ character.notes }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="play-state">
+    <div class="stat">
+      <span class="label">Juice</span>
+      <span class="value">{{ character.juice|default(0) }}</span>
+    </div>
+    <div class="stat">
+      <span class="label">Build-Up</span>
+      <span class="value">{{ character.build_up|default(0) }}</span>
+    </div>
+    <div class="stat">
+      <span class="label">Story Tags</span>
+      <span class="value">{{ (character.story_tags|default([]))|length }}</span>
+    </div>
+    <div class="stat">
+      <span class="label">Statuses</span>
+      <span class="value">{{ (character.statuses|default([]))|length }}</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

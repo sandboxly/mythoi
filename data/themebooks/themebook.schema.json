@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythoi.local/schemas/themebook.schema.json",
+  "title": "City of Mist Themebook",
+  "description": "A questionnaire used during character creation to flesh out a single theme (Mythos, Logos, Crew, or Extra).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "name",
+    "description",
+    "concept",
+    "power_tag_questions",
+    "weakness_tag_questions",
+    "mystery_or_identity",
+    "title",
+    "theme_improvements"
+  ],
+  "properties": {
+    "$schema": {
+      "description": "Optional pointer to this schema, used by IDE tooling.",
+      "type": "string"
+    },
+    "type": {
+      "description": "Top-level category of theme this themebook produces.",
+      "enum": ["mythos", "logos", "crew", "extra"]
+    },
+    "name": {
+      "description": "Themebook name, e.g. ADAPTATION, DEFINING EVENT, ALLY.",
+      "type": "string",
+      "minLength": 1
+    },
+    "categories": {
+      "description": "Optional comma/dot-separated list of category bullets that appear under the name (e.g. 'A SIDEKICK · A FAMILIAR · ...').",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "description": {
+      "description": "Prose description of what the theme covers.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "concept": {
+      "description": "Concept section: optional concept questions and sentence starters that help clarify the theme idea before answering tag questions.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_question"],
+      "properties": {
+        "intro": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "main_question": {
+          "description": "The headline concept question (typically marked with '?' in the book).",
+          "type": "string",
+          "minLength": 1
+        },
+        "sentence_starters": {
+          "description": "Bullet sentence starters that prompt the player to flesh out the concept.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "follow_up": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "power_tag_questions": {
+      "description": "Lettered power tag questions. The first one is the core question and must be answered.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/tag_question" }
+    },
+    "weakness_tag_questions": {
+      "description": "Lettered weakness tag questions. Each theme starts with one weakness tag.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/tag_question" }
+    },
+    "extra_tags": {
+      "description": "Optional rules text about taking an extra power/weakness tag in lieu of doing it in another themebook.",
+      "type": "string"
+    },
+    "mystery_or_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "examples"],
+      "properties": {
+        "kind": {
+          "description": "Mythos themes have a Mystery, Logos themes an Identity, Crew/Extra themes either.",
+          "enum": ["mystery", "identity", "either"]
+        },
+        "intro": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text"],
+            "properties": {
+              "context": {
+                "description": "Parenthetical concept hint shown alongside the example, e.g. 'Big heist'.",
+                "type": "string"
+              },
+              "text": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "guidance_options": {
+          "description": "Bulleted suggestions for what kind of Mystery/Identity to choose.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "title": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instructions", "examples"],
+      "properties": {
+        "instructions": { "type": "string", "minLength": 1 },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text"],
+            "properties": {
+              "context": { "type": "string" },
+              "text": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "crew_relationships": {
+      "description": "Optional list of relationship scenarios used after character creation when finalizing the crew.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "theme_improvements": {
+      "description": "Named improvements that can be unlocked for this theme during play.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "source": {
+      "description": "Bibliographic pointer to where in the source material this themebook is defined.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "book": { "type": "string" },
+        "page": { "type": "integer", "minimum": 1 },
+        "markdown_line": { "type": "integer", "minimum": 1 },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "tag_question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["letter", "question"],
+      "properties": {
+        "letter": {
+          "description": "The single-letter index of the question in the themebook (A-J typical).",
+          "type": "string",
+          "pattern": "^[A-Z]$"
+        },
+        "question": {
+          "description": "The full question text. May be marked truncated when the source markdown lost text mid-line.",
+          "type": "string",
+          "minLength": 1
+        },
+        "examples": {
+          "description": "Example tag answers shown in the book (italicized in the source).",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "truncated": {
+          "description": "True when the question text could not be fully recovered from the source markdown extraction.",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

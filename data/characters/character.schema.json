@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythoi.local/schemas/character.schema.json",
+  "title": "City of Mist Character",
+  "description": "A player character (or detailed NPC) in City of Mist.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "concept", "awareness", "themes"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pronouns": {
+      "type": "string",
+      "description": "e.g. 'he/him', 'she/her', 'they/them'"
+    },
+    "portrait": {
+      "type": "string",
+      "description": "Path or URL to a portrait image."
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mythos", "logos"],
+      "properties": {
+        "mythos": {
+          "description": "Short legend identifier, e.g. 'Dr. Faustus'.",
+          "type": "string",
+          "minLength": 1
+        },
+        "mythos_description": {
+          "description": "Optional one-line elaboration of the Mythos concept.",
+          "type": "string"
+        },
+        "logos": {
+          "description": "Short everyday-life identifier, e.g. 'hard-boiled private investigator'.",
+          "type": "string",
+          "minLength": 1
+        },
+        "logos_description": {
+          "description": "Optional one-line elaboration of the Logos concept.",
+          "type": "string"
+        }
+      }
+    },
+    "awareness": {
+      "description": "Awareness of being a Rift, 0-10. 0-1=Touched, 2-4=Mythos:Logos 2:2, 5-7=Mythos:Logos 3:1, 8-10=Avatar (4 Mythos).",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10
+    },
+    "character_class": {
+      "description": "Optional discrete classification derived from awareness and theme balance.",
+      "enum": ["sleeper", "touched", "awakened", "avatar"]
+    },
+    "setting": {
+      "type": "string",
+      "description": "Free-form setting description, e.g. 'The City, mid-1990s'."
+    },
+    "themes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "$ref": "#/$defs/theme" }
+    },
+    "crew_theme": {
+      "description": "Reference to the crew theme (id, file path, or null if not yet established).",
+      "type": ["string", "null"]
+    },
+    "story_tags": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/story_tag" }
+    },
+    "statuses": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/status" }
+    },
+    "help_points": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationship_points" }
+    },
+    "hurt_points": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationship_points" }
+    },
+    "juice": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "build_up": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "nemeses": {
+      "description": "List of Nemeses gained by losing/replacing themes. Empty for starting characters.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/nemesis" }
+    },
+    "secondary_characters": {
+      "description": "MC-controlled NPCs tied closely to this character (e.g. Allies who serve as Secondary Characters, recurring contacts, etc.).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/secondary_character" }
+    },
+    "moments_of_evolution": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "connections": {
+      "description": "Free-form list of character-callback notes — recurring NPCs, motifs, in-jokes the table has agreed on.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Free-form metadata (created date, source book references, etc.).",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "themebook", "title", "power_tags", "weakness_tags", "mystery_or_identity"],
+      "properties": {
+        "type": {
+          "enum": ["mythos", "logos", "crew", "extra"]
+        },
+        "themebook": {
+          "description": "Name of the themebook this theme uses (e.g. 'DIVINATION'). Should match a themebook in data/themebooks/.",
+          "type": "string",
+          "minLength": 1
+        },
+        "themebook_ref": {
+          "description": "Optional path to the themebook JSON file for tooling.",
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mystery_or_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "text"],
+          "properties": {
+            "kind": { "enum": ["mystery", "identity"] },
+            "text": { "type": "string", "minLength": 1 }
+          }
+        },
+        "attention": {
+          "description": "Attention track: 0-3 boxes filled. At 3, gain an improvement and reset to 0.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "fade_or_crack": {
+          "description": "Fade (Mythos) or Crack (Logos) track: 0-3 boxes filled. At 3, the theme is replaced.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "power_tags": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/power_tag" }
+        },
+        "weakness_tags": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/weakness_tag" }
+        },
+        "improvements_taken": {
+          "description": "Names of theme improvements unlocked, matching entries in the themebook's theme_improvements list.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "power_tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["letter", "tag"],
+      "properties": {
+        "letter": {
+          "description": "The themebook question letter that produced this tag (A-Z).",
+          "type": "string",
+          "pattern": "^[A-Z]$"
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extra": {
+          "description": "True if this tag was taken via the EXTRA TAGS rule.",
+          "type": "boolean",
+          "default": false
+        },
+        "burnt": {
+          "description": "True when the tag has been burnt for an automatic hit and not yet recovered.",
+          "type": "boolean",
+          "default": false
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "weakness_tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["letter", "tag"],
+      "properties": {
+        "letter": {
+          "type": "string",
+          "pattern": "^[A-Z]$"
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extra": {
+          "type": "boolean",
+          "default": false
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "story_tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag"],
+      "properties": {
+        "tag": { "type": "string", "minLength": 1 },
+        "source": { "type": "string" },
+        "kind": {
+          "enum": ["temporary", "ongoing", "permanent"],
+          "default": "temporary"
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "tier"],
+      "properties": {
+        "tag": { "type": "string", "minLength": 1 },
+        "tier": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "kind": {
+          "enum": ["temporary", "ongoing"],
+          "default": "temporary"
+        }
+      }
+    },
+    "relationship_points": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "points"],
+      "properties": {
+        "target": {
+          "description": "Name of the other character (PC) this relationship is with.",
+          "type": "string",
+          "minLength": 1
+        },
+        "points": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        }
+      }
+    },
+    "nemesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "from_theme": {
+          "description": "Title of the theme that was lost to spawn this Nemesis.",
+          "type": "string"
+        },
+        "description": { "type": "string" }
+      }
+    },
+    "secondary_character": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "role": {
+          "description": "e.g. 'Ally', 'Mentor', 'Sidekick', 'Familiar'.",
+          "type": "string"
+        },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}
