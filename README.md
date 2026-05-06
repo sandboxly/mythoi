@@ -11,16 +11,20 @@ The data layer (themebook content, schema, rendering) is purely deterministic Py
 ```
 mythoi/
 ├── .claude-plugin/
-│   └── plugin.json                # Claude Code plugin manifest
+│   ├── plugin.json                # Claude Code plugin manifest
+│   └── marketplace.json           # single-plugin marketplace catalog
 ├── .mcp.json                      # MCP server registration
 ├── commands/                      # Slash commands
 │   ├── create-character.md        # /mythoi:create-character
-│   ├── show-themebook.md          # /mythoi:show-themebook <name>
+│   ├── extract-sourcebook.md      # /mythoi:extract-sourcebook <pdf>
 │   ├── render-character.md        # /mythoi:render-character <path> [sheet|cards]
+│   ├── show-themebook.md          # /mythoi:show-themebook <name>
 │   └── validate-character.md      # /mythoi:validate-character <path>
 ├── skills/
-│   └── create-character/
-│       └── SKILL.md               # the conversational workflow
+│   ├── create-character/
+│   │   └── SKILL.md               # conversational character creation
+│   └── extract-sourcebook/
+│       └── SKILL.md               # PDF → themebook JSON extraction
 ├── hooks/
 │   ├── hooks.json                 # SessionStart → auto-install Python deps
 │   └── install_deps.sh
@@ -30,15 +34,17 @@ mythoi/
 │   ├── tools.py                   # tool implementations
 │   └── paths.py
 ├── data/
-│   ├── themebooks/                # 18 themebook JSONs + schema
-│   └── characters/                # character schema + sample characters
+│   ├── themebooks/                # themebook.schema.json (your extracted JSONs land here)
+│   └── characters/                # character.schema.json
 ├── templates/                     # Jinja2 HTML templates for rendering
 │   ├── character_sheet.html.j2
 │   └── theme_cards.html.j2
 ├── scripts/                       # CLI entry points (also reused by MCP server)
+│   ├── extract_sourcebook.py      # PDF → 18 themebook JSONs
+│   ├── pdf2md.py                  # PDF → Markdown helper
 │   ├── render_character_sheet.py
-│   └── validate.py
-├── out/                           # rendered HTML/PDF outputs
+│   ├── validate.py                # validate a character file
+│   └── validate_themebooks.py     # validate extracted themebooks against schema
 └── requirements.txt
 ```
 
@@ -51,13 +57,16 @@ Requirements on the user's machine:
 
 ### 1. Install the plugin
 
+In Claude Code, add the marketplace and install:
+
 ```
-/plugin install https://github.com/<you>/mythoi
+/plugin marketplace add https://github.com/sandboxly/mythoi
+/plugin install mythoi@mythoi
 ```
 
-(Or for local development: `claude --plugin-dir ~/code/mythoi`.)
+(For local development from a clone: `claude --plugin-dir ~/code/mythoi`.)
 
-The first time the plugin is enabled, a **SessionStart hook** auto-installs the Python dependencies (`mcp`, `jsonschema`, `jinja2`) into the plugin's persistent data directory — *not* into your global Python environment. There's nothing you need to `pip install` yourself. The first launch may take 10-20 seconds while pip runs; subsequent launches are instant.
+The first time the plugin is enabled, a **SessionStart hook** auto-installs the Python dependencies (`mcp`, `jsonschema`, `jinja2`, `pymupdf4llm`) into the plugin's persistent data directory — *not* into your global Python environment. There's nothing you need to `pip install` yourself. The first launch may take 10-20 seconds while pip runs; subsequent launches are instant.
 
 If the auto-install ever fails (e.g. you're using a non-default Python), set `MYTHOI_PYTHON=/path/to/python3` in your shell or in `.mcp.json`'s `env` block.
 
@@ -123,8 +132,7 @@ Restart Claude Desktop and the ten Mythoi tools will be available in any chat. Y
 | `validate_character(character)` | Schema validation, returns `{ok, errors[]}` |
 | `save_character(character, path?)` | Write JSON (default `~/.mythoi/characters/<slug>.json`) |
 | `load_character(path)` | Load a character JSON |
-| `render_sheet(character, layout?, format?, output?)` | Render to HTML or PDF (`sheet` or `cards` layout) |
-| `render_character_file(path, ...)` | Same as `render_sheet` but for a saved file |
+| `render_sheet(character, layout?, format?, output?)` | Render to HTML or PDF (`sheet` or `cards` layout). `character` accepts a JSON object or a path to a saved file. |
 
 ## Customizing where characters are saved
 
@@ -142,13 +150,16 @@ Even without the plugin, the scripts are useful:
 
 ```bash
 # Extract themebook data from your own PDF
-python scripts/extract_sourcebook.py ~/Downloads/city_of_mist_players_guide.pdf
+python scripts/extract_sourcebook.py ~/Downloads/players_guide.pdf
 
 # Render any character file
-python scripts/render_character_sheet.py data/characters/humphrey_chandler.json --pdf
+python scripts/render_character_sheet.py path/to/character.json --pdf
 
-# Validate everything
-python scripts/validate.py
+# Validate a character file against the schema
+python scripts/validate.py path/to/character.json
+
+# Validate all extracted themebooks against the themebook schema
+python scripts/validate_themebooks.py
 ```
 
 ## Status

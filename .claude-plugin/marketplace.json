@@ -1,0 +1,13 @@
+{
+  "name": "mythoi",
+  "owner": {
+    "name": "Stephan Lengl"
+  },
+  "plugins": [
+    {
+      "name": "mythoi",
+      "source": ".",
+      "description": "City of Mist character creation assistant — themebook-aware skill, deterministic MCP tools, printable HTML/PDF sheets."
+    }
+  ]
+}
