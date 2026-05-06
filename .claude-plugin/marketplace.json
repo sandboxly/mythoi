@@ -6,7 +6,10 @@
   "plugins": [
     {
       "name": "mythoi",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "sandboxly/mythoi"
+      },
       "description": "City of Mist character creation assistant — themebook-aware skill, deterministic MCP tools, printable HTML/PDF sheets."
     }
   ]
