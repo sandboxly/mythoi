@@ -47,6 +47,36 @@ def themebook_question(themebook: str, letter: str, kind: str = "power") -> dict
 
 
 @mcp.tool()
+def extract_pdf_to_markdown(
+    pdf_path: str,
+    output_path: Optional[str] = None,
+) -> dict[str, Any]:
+    """Convert a PDF to Markdown using pymupdf4llm (first step of themebook extraction).
+
+    Args:
+        pdf_path: Absolute or home-relative path to the PDF file.
+        output_path: Where to write the .md file. Defaults to same directory as PDF with .md extension.
+
+    Returns:
+        {"ok": bool, "markdown_path": str, "size_bytes": int} or {"ok": false, "error": str}
+    """
+    return tools.extract_pdf_to_markdown(pdf_path, output_path=output_path)
+
+
+@mcp.tool()
+def save_themebook(themebook: dict[str, Any]) -> dict[str, Any]:
+    """Validate and persist one themebook JSON to data/themebooks/<type>/<name>.json.
+
+    Args:
+        themebook: A themebook object conforming to the themebook JSON schema.
+
+    Returns:
+        {"ok": true, "path": str} or {"ok": false, "errors": [...]}
+    """
+    return tools.save_themebook(themebook)
+
+
+@mcp.tool()
 def get_character_schema() -> dict[str, Any]:
     """Return the character JSON schema for inspection."""
     return tools.get_character_schema()

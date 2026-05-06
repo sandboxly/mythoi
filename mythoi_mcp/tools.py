@@ -92,6 +92,56 @@ def themebook_question(themebook: str, letter: str, kind: str = "power") -> dict
 
 
 # ---------------------------------------------------------------------------
+# Sourcebook extraction
+# ---------------------------------------------------------------------------
+
+
+def extract_pdf_to_markdown(pdf_path: str, output_path: str | None = None) -> dict[str, Any]:
+    """Convert a PDF to Markdown using pymupdf4llm. Returns {ok, markdown_path}."""
+    resolved = Path(pdf_path).expanduser().resolve()
+    if not resolved.exists():
+        return {"ok": False, "error": f"File not found: {resolved}"}
+
+    out = (
+        Path(output_path).expanduser().resolve()
+        if output_path
+        else resolved.with_suffix(".md")
+    )
+
+    cmd = [sys.executable, str(paths.extract_script()), str(resolved), "-o", str(out)]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+
+    if result.returncode != 0:
+        return {"ok": False, "error": result.stderr.strip()}
+
+    return {
+        "ok": True,
+        "markdown_path": str(out),
+        "size_bytes": out.stat().st_size,
+    }
+
+
+def save_themebook(themebook: dict[str, Any]) -> dict[str, Any]:
+    """Validate and save a themebook JSON to data/themebooks/<type>/<slug>.json."""
+    schema = json.loads(paths.themebook_schema_path().read_text())
+    errors: list[str] = []
+    try:
+        jsonschema.validate(themebook, schema)
+    except jsonschema.ValidationError as e:
+        errors.append(e.message)
+
+    if errors:
+        return {"ok": False, "errors": errors}
+
+    type_ = themebook["type"]
+    slug = _slugify(themebook["name"])
+    dest = paths.themebooks_dir() / type_ / f"{slug}.json"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(json.dumps(themebook, indent=2, ensure_ascii=False) + "\n")
+    return {"ok": True, "path": str(dest)}
+
+
+# ---------------------------------------------------------------------------
 # Character tools
 # ---------------------------------------------------------------------------
 

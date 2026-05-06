@@ -21,6 +21,9 @@ mythoi/
 ├── skills/
 │   └── create-character/
 │       └── SKILL.md               # the conversational workflow
+├── hooks/
+│   ├── hooks.json                 # SessionStart → auto-install Python deps
+│   └── install_deps.sh
 ├── mythoi_mcp/                    # Python MCP server
 │   ├── __main__.py
 │   ├── server.py                  # FastMCP wiring
@@ -41,36 +44,32 @@ mythoi/
 
 ## Install — Claude Code (recommended)
 
-Requirements:
-- Claude Code
-- Python 3.10+ on `PATH`
-- Google Chrome (for PDF rendering — purely optional)
+Requirements on the user's machine:
+- **Claude Code**
+- **Python 3.10+ with pip** on `PATH` (default on most Macs / dev machines)
+- **Google Chrome** — *optional*, only needed if you want PDF output. HTML rendering works without it.
 
-### 1. Install the Python dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Install the plugin
-
-For now, install from a local clone:
-
-```bash
-git clone <this-repo> ~/code/mythoi
-```
-
-Then in Claude Code:
+### 1. Install the plugin
 
 ```
-/plugin install ~/code/mythoi
+/plugin install https://github.com/<you>/mythoi
 ```
 
-Or launch Claude Code with the plugin pre-loaded:
+(Or for local development: `claude --plugin-dir ~/code/mythoi`.)
 
-```bash
-claude --plugin-dir ~/code/mythoi
+The first time the plugin is enabled, a **SessionStart hook** auto-installs the Python dependencies (`mcp`, `jsonschema`, `jinja2`) into the plugin's persistent data directory — *not* into your global Python environment. There's nothing you need to `pip install` yourself. The first launch may take 10-20 seconds while pip runs; subsequent launches are instant.
+
+If the auto-install ever fails (e.g. you're using a non-default Python), set `MYTHOI_PYTHON=/path/to/python3` in your shell or in `.mcp.json`'s `env` block.
+
+### 2. Load your rulebook (one-time setup)
+
+The plugin does not ship the City of Mist content (that's copyrighted). You need to supply your own copy of the **City of Mist Players Guide** PDF and extract the themebook data from it once:
+
 ```
+/mythoi:extract-sourcebook ~/Downloads/city_of_mist_players_guide.pdf
+```
+
+Claude will convert the PDF to Markdown, parse all 18 themebooks, and save them as JSON into the plugin's `data/themebooks/` directory. This takes about a minute and only needs to happen once (or when you add a new supplement).
 
 ### 3. Use it
 
@@ -86,7 +85,13 @@ Claude will walk you through the whole character-creation flow. The character JS
 
 ## Install — Claude Desktop (MCP only, no skills)
 
-Claude Desktop doesn't run plugins, but you can register the same MCP server in `claude_desktop_config.json`:
+Claude Desktop doesn't run plugins (so no auto-install hook), but you can register the same MCP server manually. Install deps once:
+
+```bash
+pip install -r requirements.txt
+```
+
+Then add to `claude_desktop_config.json`:
 
 ```json
 {
@@ -102,12 +107,14 @@ Claude Desktop doesn't run plugins, but you can register the same MCP server in 
 }
 ```
 
-Restart Claude Desktop and the eight Mythoi tools will be available in any chat. You won't get the conversational `/create-character` skill, but you can still ask Claude in plain language: *"Help me create a City of Mist character. Use the mythoi tools."*
+Restart Claude Desktop and the ten Mythoi tools will be available in any chat. You won't get the conversational `/create-character` skill, but you can still ask Claude in plain language: *"Help me create a City of Mist character. Use the mythoi tools."*
 
 ## MCP tools exposed
 
 | Tool | Purpose |
 |---|---|
+| `extract_pdf_to_markdown(pdf_path, output_path?)` | Convert a PDF to Markdown (first step of themebook extraction) |
+| `save_themebook(themebook)` | Validate and save one parsed themebook JSON |
 | `list_themebooks(type?)` | Browse the 18 themebooks (filterable by mythos/logos/crew/extra) |
 | `get_themebook(name)` | Fetch a full themebook (description, all questions, examples, theme improvements) |
 | `themebook_question(themebook, letter, kind?)` | Fetch one tag question + examples |
@@ -131,9 +138,12 @@ MYTHOI_CHARACTERS_DIR=/some/other/path
 
 ## Working with the data directly
 
-Even without the plugin, the bare repo is useful:
+Even without the plugin, the scripts are useful:
 
 ```bash
+# Extract themebook data from your own PDF
+python scripts/extract_sourcebook.py ~/Downloads/city_of_mist_players_guide.pdf
+
 # Render any character file
 python scripts/render_character_sheet.py data/characters/humphrey_chandler.json --pdf
 

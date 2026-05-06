@@ -56,6 +56,10 @@ def render_script() -> Path:
     return plugin_root() / "scripts" / "render_character_sheet.py"
 
 
+def extract_script() -> Path:
+    return plugin_root() / "scripts" / "extract_sourcebook.py"
+
+
 def default_character_dir() -> Path:
     """Where new character files go by default. Lives in user-space, not the repo."""
     env = os.environ.get("MYTHOI_CHARACTERS_DIR")
