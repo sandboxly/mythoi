@@ -1,0 +1,19 @@
+{
+  "name": "mythoi",
+  "version": "0.2.0",
+  "description": "City of Mist character creation assistant — themebook-aware skill, deterministic MCP tools, printable HTML/PDF sheets.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "mupdf": "^1.3.0",
+    "nunjucks": "^3.2.4",
+    "zod": "^4.4.3"
+  }
+}

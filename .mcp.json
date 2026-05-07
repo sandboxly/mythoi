@@ -1,12 +1,8 @@
 {
   "mcpServers": {
     "mythoi": {
-      "command": "python3",
-      "args": ["-m", "mythoi_mcp"],
-      "env": {
-        "PYTHONPATH": "${CLAUDE_PLUGIN_DATA}/lib:${CLAUDE_PLUGIN_ROOT}",
-        "CLAUDE_PLUGIN_ROOT": "${CLAUDE_PLUGIN_ROOT}"
-      }
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/bin/server.js"]
     }
   }
 }

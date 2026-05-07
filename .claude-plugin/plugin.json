@@ -1,6 +1,6 @@
 {
   "name": "mythoi",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "City of Mist character creation assistant — themebook-aware skill, deterministic MCP tools, printable HTML/PDF sheets.",
   "author": {
     "name": "Stephan Lengl"
@@ -11,7 +11,7 @@
     "character-creation",
     "ttrpg"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "mcpServers": "./.mcp.json",
   "skills": "./skills/",
   "commands": "./commands/",

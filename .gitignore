@@ -12,14 +12,8 @@ data/themebooks/extra/
 # Rendered outputs
 out/
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-.pytest_cache/
-.venv/
-venv/
-*.egg-info/
+# Node — installed at session-start into $CLAUDE_PLUGIN_DATA, not committed
+node_modules/
 
 # IDE / macOS
 .vscode/
